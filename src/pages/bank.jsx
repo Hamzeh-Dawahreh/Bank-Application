@@ -1,137 +1,129 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { BankData } from "../redux/bankSlice";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addAccount, deleteAccount } from "../app/store";
 
-export const Bank = () => {
-  const bank = useSelector((state) => state);
-  console.log(bank);
+const Bank = () => {
+  const accounts = useSelector((state) => state.accounts);
+  const numberOfAccounts = useSelector((state) => state.numberOfAccounts); // Get numberOfAccounts from the state
+  const dispatch = useDispatch();
+
+  const [formData, setFormData] = useState({
+    customerName: "",
+    accountNumber: "",
+    accountType: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAddAccount = (e) => {
+    e.preventDefault();
+    const newAccount = {
+      id: Date.now(),
+      customerName: formData.customerName,
+      accountNumber: formData.accountNumber,
+      accountType: formData.accountType,
+    };
+    dispatch(addAccount(newAccount));
+    setFormData({
+      customerName: "",
+      accountNumber: "",
+      accountType: "",
+    });
+  };
+
+  const handleDeleteAccount = (accountId) => {
+    dispatch(deleteAccount(accountId));
+  };
+
   return (
-    <>
-      <header className="bg-white ">
-        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="hidden md:block">
-              <nav aria-label="Global">
-                <ul className="flex items-center gap-6 text-sm">
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      About
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      Careers
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      History
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      Services
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      Projects
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      className="text-gray-500 transition hover:text-gray-500/75"
-                      href="/"
-                    >
-                      Blog
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="block md:hidden">
-                <button className="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
+    <main className="p-4">
+      <p className="text-center text-2xl">
+        Number of Accounts: {numberOfAccounts}
+      </p>
+      <table className="w-full border-collapse mb-4">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="py-2 px-4 border-b">ID</th>
+            <th className="py-2 px-4 border-b">Customer Name</th>
+            <th className="py-2 px-4 border-b">Account Number</th>
+            <th className="py-2 px-4 border-b">Account Type</th>
+            <th className="py-2 px-4 border-b"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {accounts?.map((account) => (
+            <tr key={account.id} className="hover:bg-gray-100">
+              <td className="py-2 px-4 border-b">{account.id}</td>
+              <td className="py-2 px-4 border-b">{account.customerName}</td>
+              <td className="py-2 px-4 border-b">{account.accountNumber}</td>
+              <td className="py-2 px-4 border-b">{account.accountType}</td>
+              <td className="py-2 px-4 border-b">
+                <button
+                  onClick={() => handleDeleteAccount(account.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
+                >
+                  Delete
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-          <thead className="ltr:text-left rtl:text-right">
-            <tr>
-              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                ID
-              </th>
-              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                CUSTOMER NAME
-              </th>
-              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                ACCOUNT NUMBER
-              </th>
-              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                ACCOUNT TYPE
-              </th>
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
 
-          <tbody className="divide-y divide-gray-200">
-            {bank.bank.accounts.map((data) => (
-              <tr>
-                <td className="whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900">
-                  {data.id}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900">
-                  {data.customerName}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700 text-center">
-                  {data.accountNumber}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-center text-gray-700">
-                  {data.accountType}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+      <form onSubmit={handleAddAccount} className="mb-4">
+        <div className="flex flex-col mb-4">
+          <label htmlFor="customerName" className="text-lg font-medium mb-2">
+            Customer Name
+          </label>
+          <input
+            type="text"
+            id="customerName"
+            name="customerName"
+            value={formData.customerName}
+            onChange={handleChange}
+            className="border-gray-300 border rounded py-2 px-4"
+            required
+          />
+        </div>
+        <div className="flex flex-col mb-4">
+          <label htmlFor="accountNumber" className="text-lg font-medium mb-2">
+            Account Number
+          </label>
+          <input
+            type="text"
+            id="accountNumber"
+            name="accountNumber"
+            value={formData.accountNumber}
+            onChange={handleChange}
+            className="border-gray-300 border rounded py-2 px-4"
+            required
+          />
+        </div>
+        <div className="flex flex-col mb-4">
+          <label htmlFor="accountType" className="text-lg font-medium mb-2">
+            Account Type
+          </label>
+          <input
+            type="text"
+            id="accountType"
+            name="accountType"
+            value={formData.accountType}
+            onChange={handleChange}
+            className="border-gray-300 border rounded py-2 px-4"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+        >
+          Add Account
+        </button>
+      </form>
+    </main>
   );
 };
+
+export default Bank;
